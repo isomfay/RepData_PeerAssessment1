@@ -1,0 +1,46 @@
+---
+title: "RepData_PeerAssessment1"
+author: "Somfay István"
+date: "2015. július 19."
+output: html_document
+---
+
+
+## Loading and preprocessing the data
+
+Loading and processing data...
+```{r loaddata, cache=TRUE}
+fileurl <- "http://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+temp <- tempfile()
+download.file(fileurl,temp, mode="wb")
+data <- read.csv(unz(temp, "activity.csv"), header=TRUE, sep=",", na.strings="NA")
+unlink(temp)
+```
+## What is mean total number of steps taken per day?
+```{r aggregating}
+library(dplyr)
+library(ggplot2)
+sums <- data %>% group_by(date) %>% summarize(steps = sum(steps, na.rm=TRUE))
+mean <- mean(sums$steps)
+median <- median(sums$steps)
+hist <- ggplot(sums, aes(steps))
+hist + geom_histogram(binwidth=(range(sums$steps)[2]/7)) + geom_vline(xintercept=mean, colour="red") + geom_vline(xintercept=median, colour="blue")
+```
+
+The total number of steps are aggregated by days. The histogram shows the total number of steps taken each day. The red line shows the mean (`r mean`) and the blue line shows the median (`r median`) of the total number of steps taken per day.
+
+## What is the average daily activity pattern?
+```{r average}
+minutes <- data %>% group_by(interval) %>% summarize (steps = mean(steps, na.rm=TRUE))
+plot(minutes$interval, minutes$steps, type="l", xlab="interval", ylab="average steps")
+max <- filter(minutes, steps == max(minutes$steps))[1,1]
+```
+On average across all the days in the dataset, the `r max` 5-minute interval contains the maximum number of steps.
+
+## Imputing missing values
+```{r missing}
+nalines <- sum(is.na(data$steps))
+
+```
+The total number of missing values are `r nalines`
+## Are there differences in activity patterns between weekdays and weekends?
