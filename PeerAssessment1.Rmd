@@ -42,5 +42,6 @@ On average across all the days in the dataset, the `r max` 5-minute interval con
 nalines <- sum(is.na(data$steps))
 
 ```
-The total number of missing values are `r nalines`
+The total number of missing values are `r nalines`.
+
 ## Are there differences in activity patterns between weekdays and weekends?
